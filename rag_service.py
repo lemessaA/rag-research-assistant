@@ -1,6 +1,7 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
-from database import embeddings, collection
+from database import embeddings, collection, get_cached_embedding
+from cache import cache
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -9,12 +10,18 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv(Path(__file__).parent / ".env")
 
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.7, api_key=os.getenv("GROQ_API_KEY"))
+llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0.7, api_key=os.getenv("GROQ_API_KEY"))
 
 def search_research_db(query: str, top_k: int = 3):
-    query_embedding = embeddings.embed_query(query)
+    # Check cache first
+    cached_results = cache.get_cached_search_results(query)
+    if cached_results:
+        return cached_results
+
+    query_embedding = get_cached_embedding(query)
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
-    return [
+
+    formatted_results = [
         {
             "content": doc,
             "title": results["metadatas"][0][i].get("title", "Unknown"),
@@ -23,7 +30,20 @@ def search_research_db(query: str, top_k: int = 3):
         for i, doc in enumerate(results["documents"][0])
     ]
 
+    # Cache the results
+    cache.cache_search_results(query, formatted_results)
+
+    return formatted_results
+
 def answer_research_question(query: str, mode: str = "research"):
+    # Create cache key that includes both query and mode
+    cache_key = f"answer:{mode}:{query}"
+
+    # Check cache first
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        return cached_response
+
     chunks = search_research_db(query)
     
     # Define different prompt modes
@@ -107,7 +127,9 @@ As a tutor, you should:
     selected_prompt = prompts.get(mode, prompts["research"])
     
     if not chunks:
-        return ("I don't have enough information to answer this question.", [])
+        response = ("I don't have enough information to answer this question.", [])
+        cache.set(cache_key, response, ttl=1800)  # Cache for 30 minutes
+        return response
 
     context = "\n\n".join([f"From {c['title']}:\n{c['content']}" for c in chunks])
     
@@ -116,7 +138,13 @@ As a tutor, you should:
         template=selected_prompt
     ).format(context=context, question=query)
     
-    return llm.invoke(prompt).content, chunks
+    answer = llm.invoke(prompt).content
+    response = (answer, chunks)
+
+    # Cache the response for 30 minutes
+    cache.set(cache_key, response, ttl=1800)
+
+    return response
 
 def ingest_document(file_path: str, original_filename: str):
     """Ingest a single document into the vector database"""
