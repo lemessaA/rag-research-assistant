@@ -9,6 +9,7 @@ A FastAPI-based Research Assistant with RAG (Retrieval-Augmented Generation) cap
 - 🎨 **Beautiful UI**: Streamlit interface for easy interaction
 - 📚 **Source Citations**: Answers include source references with relevance scores
 - 🚀 **FastAPI Backend**: High-performance API with automatic documentation
+- ⚡ **Redis Caching**: Fast caching for embeddings, search results, and LLM responses
 
 ## Quick Start
 
@@ -33,9 +34,37 @@ Create a `.env` file in the root directory:
 
 ```env
 GROQ_API_KEY="your_groq_api_key_here"
+REDIS_URL=redis://localhost:6379
 ```
 
 Get your API key from [Groq Console](https://console.groq.com/).
+
+### 3. Set Up Redis (Optional but Recommended)
+
+Redis provides caching for better performance. Run the setup helper:
+
+```bash
+python redis_setup.py
+```
+
+Or install and start Redis manually:
+
+**Ubuntu/Debian:**
+```bash
+sudo apt update && sudo apt install redis-server
+sudo systemctl start redis-server
+```
+
+**macOS:**
+```bash
+brew install redis
+brew services start redis
+```
+
+**Test Redis:**
+```bash
+redis-cli ping  # Should respond with "PONG"
+```
 
 ### 3. Populate Initial Data
 
@@ -63,6 +92,32 @@ streamlit run streamlit_app.py
 ```
 
 The UI will be available at http://localhost:8501
+
+## Caching with Redis
+
+Redis caching significantly improves performance by storing:
+
+- **Embeddings**: Text embeddings are cached for 24 hours
+- **Search Results**: Vector search results cached for 30 minutes  
+- **LLM Responses**: Generated answers cached for 30 minutes
+
+### Cache Management
+
+**View cache statistics:**
+```bash
+curl http://localhost:8000/cache/stats
+```
+
+**Clear all cached data:**
+```bash
+curl -X POST http://localhost:8000/cache/clear
+```
+
+**Benefits:**
+- ⚡ Faster response times for repeated queries
+- 💰 Reduced API costs (fewer LLM calls)
+- 🔄 Better user experience
+- 📊 Cache hit statistics available via API
 
 ## Usage
 
@@ -93,6 +148,8 @@ curl -X POST "http://localhost:8000/research" \
 - `GET /` - Health check
 - `POST /research` - Ask questions about documents
 - `POST /upload` - Upload and process documents
+- `POST /cache/clear` - Clear all cached data
+- `GET /cache/stats` - Get cache statistics
 
 ## Supported File Formats
 
@@ -110,7 +167,9 @@ curl -X POST "http://localhost:8000/research" \
 ├── main.py              # FastAPI application
 ├── rag_service.py       # RAG logic and LLM integration
 ├── database.py          # Vector database setup
+├── cache.py             # Redis caching layer
 ├── setup_data.py        # Initial data ingestion
+├── redis_setup.py       # Redis setup helper
 ├── streamlit_app.py     # Streamlit UI
 ├── requirements.txt     # Python dependencies
 └── sample_data/         # Sample documents
@@ -121,6 +180,7 @@ curl -X POST "http://localhost:8000/research" \
 - **Backend**: FastAPI, Uvicorn
 - **Frontend**: Streamlit
 - **Vector Database**: ChromaDB
+- **Cache**: Redis
 - **Embeddings**: HuggingFace Transformers
 - **LLM**: Groq (Llama models)
 - **Document Processing**: LangChain
