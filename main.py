@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import List
 from rag_service import answer_research_question
+from cache import cache
 import os
 import uuid
 
@@ -66,6 +67,49 @@ async def upload_document(file: UploadFile = File(...)):
             filename=file.filename,
             chunks_created=chunks_created
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/cache/clear")
+async def clear_cache():
+    """Clear all cached data"""
+    try:
+        success = cache.clear_all_cache()
+        if success:
+            return {"message": "Cache cleared successfully"}
+        else:
+            return {"message": "Cache clearing failed or Redis not available"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/cache/stats")
+async def get_cache_stats():
+    """Get cache statistics"""
+    try:
+        if not cache.redis_client:
+            return {"status": "Redis not connected", "stats": {}}
+
+        info = cache.redis_client.info()
+        keys = cache.redis_client.keys("*")
+
+        embedding_keys = [k for k in keys if k.startswith("embedding:")]
+        search_keys = [k for k in keys if k.startswith("search:")]
+        answer_keys = [k for k in keys if k.startswith("answer:")]
+
+        return {
+            "status": "connected",
+            "stats": {
+                "total_keys": len(keys),
+                "embedding_cache_keys": len(embedding_keys),
+                "search_cache_keys": len(search_keys),
+                "answer_cache_keys": len(answer_keys),
+                "redis_info": {
+                    "used_memory": info.get("used_memory_human", "N/A"),
+                    "connected_clients": info.get("connected_clients", "N/A"),
+                    "uptime_days": info.get("uptime_in_days", "N/A")
+                }
+            }
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
