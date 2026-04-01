@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import ChatGPTInterface from '@/components/ChatGPTInterface';
+import ThemedChatInterface from '@/components/ThemedChatInterface';
 import { UploadedFile } from '@/types';
 
 export default function HomePage() {
@@ -12,8 +12,8 @@ export default function HomePage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <ChatGPTInterface 
+    <div className="h-screen">
+      <ThemedChatInterface 
         uploadedFiles={uploadedFiles} 
         onFileUploaded={handleFileUploaded}
       />

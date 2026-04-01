@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'AI Research Assistant',
@@ -14,8 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
-        {children}
+      <body className="h-screen overflow-hidden">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
