@@ -12,7 +12,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="h-screen bg-gray-50">
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <ChatGPTInterface 
         uploadedFiles={uploadedFiles} 
         onFileUploaded={handleFileUploaded}

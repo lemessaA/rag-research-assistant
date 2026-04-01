@@ -5,7 +5,7 @@ import { api, APIError } from '@/lib/api';
 import { ResearchMode, ResearchResponse, UploadedFile } from '@/types';
 import { RESEARCH_MODES, SUPPORTED_FILE_TYPES, MAX_FILE_SIZE } from '@/lib/constants';
 import { useSmartSuggestions, SuggestionContext } from '@/lib/smartSuggestions';
-import MarkdownRenderer from './MarkdownRenderer';
+import FormattedText from './FormattedText';
 
 interface ChatMessage {
   id: string;
@@ -144,11 +144,11 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
       
       onFileUploaded(uploadedFile);
       
-      // Add system message about upload
+      // Add AI system message about upload
       const systemMessage: ChatMessage = {
         id: `upload-${Date.now()}`,
         type: 'system',
-        content: `📄 Uploaded "${file.name}" (${result.chunks_created} chunks). You can now ask questions about this document.`,
+        content: `AI successfully processed "${file.name}" into ${result.chunks_created} knowledge chunks. Ready for intelligent analysis!`,
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, systemMessage]);
@@ -179,46 +179,52 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
   };
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      {/* ChatGPT-style Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+    <div className="h-full flex flex-col bg-gradient-to-br from-white via-blue-50 to-purple-50">
+      {/* AI Header */}
+      <div className="flex items-center justify-between p-4 border-b border-indigo-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="flex items-center space-x-3">
-          <h1 className="text-xl font-semibold text-gray-800">Research Assistant</h1>
+          <div className="text-2xl animate-pulse">🤖</div>
+          <div>
+            <h1 className="text-xl font-semibold">AI Research Assistant</h1>
+            <p className="text-sm text-blue-100">Powered by Advanced Intelligence</p>
+          </div>
           {uploadedFiles.length > 0 && (
-            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-              {uploadedFiles.length} document{uploadedFiles.length !== 1 ? 's' : ''}
+            <span className="text-sm bg-white/20 backdrop-blur px-3 py-1 rounded-full">
+              {uploadedFiles.length} document{uploadedFiles.length !== 1 ? 's' : ''} loaded
             </span>
           )}
         </div>
         
         <div className="flex items-center space-x-3">
-          {/* Mode Selector */}
+          {/* AI Mode Selector */}
           <select
             value={selectedMode}
             onChange={(e) => setSelectedMode(e.target.value as ResearchMode)}
-            className="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-sm bg-white/20 backdrop-blur border border-white/30 rounded-lg px-3 py-1 text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+            style={{ color: 'white' }}
           >
             {RESEARCH_MODES.map((mode) => (
-              <option key={mode.value} value={mode.value}>
-                {mode.label}
+              <option key={mode.value} value={mode.value} style={{ color: 'black' }}>
+                {mode.icon} {mode.label}
               </option>
             ))}
           </select>
 
-          {/* Upload Toggle */}
+          {/* AI Upload */}
           <button
             onClick={() => setShowUpload(!showUpload)}
-            className="text-sm px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="text-sm px-3 py-1 bg-white/20 backdrop-blur border border-white/30 rounded-lg hover:bg-white/30 transition-colors"
           >
-            📎
+            🧠 Upload
           </button>
         </div>
       </div>
 
       {/* Upload Panel (when toggled) */}
       {showUpload && (
-        <div className="border-b border-gray-200 p-4 bg-gray-50">
-          <div className="max-w-3xl mx-auto">
+        <div className="border-b border-indigo-200 p-4 bg-gradient-to-r from-blue-100 to-purple-100">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-sm text-blue-800 mb-2 font-medium">🧠 Feed Knowledge to AI</div>
             <input
               ref={fileInputRef}
               type="file"
@@ -230,18 +236,18 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm text-gray-600"
+              className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl hover:border-purple-400 hover:bg-white/50 transition-all duration-200 text-sm bg-white/30 backdrop-blur"
             >
               {isUploading ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 text-blue-700">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span>Processing document...</span>
+                  <span>AI is analyzing your document...</span>
                 </div>
               ) : (
-                <div>
-                  <span className="font-medium">Choose a file to upload</span>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Supports: {SUPPORTED_FILE_TYPES.join(', ').toUpperCase()}
+                <div className="text-blue-800">
+                  <div className="font-medium">📄 Upload Knowledge for AI Analysis</div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    AI supports: {SUPPORTED_FILE_TYPES.slice(0, 6).join(', ').toUpperCase()} and more
                   </div>
                 </div>
               )}
@@ -254,10 +260,12 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-4 py-6">
           {messages.length === 0 ? (
-            <div className="text-center text-gray-500 py-12">
-              <div className="text-5xl mb-4">💬</div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">How can I help you today?</h2>
-              <p className="text-gray-600 mb-6">Upload documents and ask questions to get started</p>
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4 animate-bounce">🤖</div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                How can I assist your research today?
+              </h2>
+              <p className="text-slate-600 mb-6">Upload documents to expand my knowledge and ask intelligent questions</p>
               
               {/* Initial Suggestions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl mx-auto">
@@ -265,9 +273,9 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                   <button
                     key={index}
                     onClick={() => handleSubmit(suggestion.text)}
-                    className="p-4 text-left text-sm border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                    className="p-4 text-left text-sm border border-blue-200 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:border-purple-300 transition-all duration-200 bg-white/80 backdrop-blur"
                   >
-                    <div className="font-medium text-gray-800">{suggestion.text}</div>
+                    <div className="font-medium text-blue-800">{suggestion.text}</div>
                   </button>
                 ))}
               </div>
@@ -278,10 +286,10 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                 <div key={message.id}>
                   {message.type === 'user' ? (
                     <div className="flex justify-end">
-                      <div className="max-w-5xl bg-blue-600 text-white rounded-lg p-4">
-                        <div className="whitespace-pre-wrap">{message.content}</div>
+                      <div className="max-w-5xl bg-blue-600 text-white rounded-xl p-4 shadow-sm">
+                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                         {message.mode && (
-                          <div className="text-xs text-blue-200 mt-2">
+                          <div className="text-xs text-blue-200 mt-2 opacity-75">
                             {RESEARCH_MODES.find(m => m.value === message.mode)?.label} mode
                           </div>
                         )}
@@ -289,25 +297,29 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                     </div>
                   ) : message.type === 'system' ? (
                     <div className="flex justify-center">
-                      <div className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-full">
-                        {message.content}
+                      <div className="bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 text-sm px-4 py-2 rounded-full border border-indigo-200 backdrop-blur">
+                        🤖 {message.content}
                       </div>
                     </div>
                   ) : (
                     <div className="flex justify-start">
-                      <div className="max-w-5xl bg-gray-100 text-gray-900 rounded-lg p-4">
+                      <div className="max-w-5xl bg-gradient-to-br from-white to-blue-50 text-slate-800 rounded-xl p-4 shadow-sm border border-blue-200">
                         {message.thinking ? (
                           <div className="flex items-center space-x-3">
                             <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce delay-100"></div>
+                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce delay-200"></div>
                             </div>
-                            <span className="text-sm text-gray-600">{message.thinking}</span>
+                            <span className="text-sm text-blue-600">🧠 {message.thinking}</span>
                           </div>
                         ) : (
                           <>
-                            <MarkdownRenderer 
+                            <div className="flex items-center space-x-2 mb-2 text-xs text-blue-600">
+                              <span className="animate-pulse">🤖</span>
+                              <span>AI Assistant</span>
+                            </div>
+                            <FormattedText 
                               content={message.content}
                               className="max-w-none"
                             />
@@ -323,9 +335,9 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                                       <summary className="text-sm font-medium text-blue-600 hover:text-blue-800">
                                         {source.title} ({(source.score * 100).toFixed(1)}% relevance)
                                       </summary>
-                                      <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded border">
-                                        {source.content}
-                                      </div>
+                                        <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-3 rounded border">
+                                          <FormattedText content={source.content} />
+                                        </div>
                                     </details>
                                   ))}
                                 </div>
@@ -371,14 +383,15 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
 
       {/* Suggestions Area (appears when conversation is active) */}
       {messages.length > 0 && suggestions.length > 0 && !isLoading && (
-        <div className="border-t border-gray-200 bg-gray-50 p-4">
+        <div className="border-t border-indigo-200 bg-gradient-to-r from-blue-50 to-purple-50 p-4">
           <div className="max-w-6xl mx-auto">
+            <div className="text-sm text-blue-700 mb-2 font-medium">🧠 AI Suggests:</div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               {suggestions.slice(0, 6).map((suggestion, index) => (
                 <button
                   key={`suggestion-${index}`}
                   onClick={() => handleSubmit(suggestion.text)}
-                  className="text-sm px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors text-gray-700 text-left"
+                  className="text-sm px-4 py-2 bg-white/80 backdrop-blur border border-blue-200 rounded-lg hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-100 hover:border-purple-300 transition-all duration-200 text-blue-800 text-left shadow-sm"
                 >
                   {suggestion.text.length > 50 ? suggestion.text.substring(0, 47) + '...' : suggestion.text}
                 </button>
@@ -388,8 +401,8 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
         </div>
       )}
 
-      {/* ChatGPT-style Input */}
-      <div className="border-t border-gray-200 bg-white p-4">
+      {/* AI Input */}
+      <div className="border-t border-indigo-200 bg-gradient-to-r from-white to-blue-50 p-4">
         <div className="max-w-6xl mx-auto">
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <div className="flex items-end space-x-3">
@@ -398,10 +411,10 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={uploadedFiles.length > 0 ? "Message Research Assistant" : "Upload documents first, then ask questions..."}
+                  placeholder={uploadedFiles.length > 0 ? "Message your AI Research Assistant..." : "Upload documents to unlock AI intelligence..."}
                   disabled={isLoading}
                   rows={1}
-                  className="w-full p-3 pr-12 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 pr-12 border border-blue-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 bg-white/90 backdrop-blur shadow-sm"
                   style={{ 
                     minHeight: '50px',
                     maxHeight: '150px'
@@ -419,7 +432,7 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="absolute right-3 bottom-3 p-1.5 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                  className="absolute right-3 bottom-3 p-1.5 text-blue-400 hover:text-purple-600 hover:bg-blue-100 rounded-full transition-colors disabled:opacity-50"
                   title="Upload document"
                 >
                   <span className="text-lg">📎</span>
@@ -438,7 +451,7 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -451,10 +464,11 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
             </div>
           </form>
           
-          {/* Upload Status */}
+          {/* AI Status */}
           {isUploading && (
-            <div className="mt-2 text-sm text-blue-600 text-center">
-              Processing document...
+            <div className="mt-2 text-sm text-blue-600 text-center flex items-center justify-center space-x-2">
+              <span className="animate-spin">🧠</span>
+              <span>AI is analyzing your document...</span>
             </div>
           )}
         </div>
