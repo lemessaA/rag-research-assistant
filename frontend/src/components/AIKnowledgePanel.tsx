@@ -117,40 +117,31 @@ export default function AIKnowledgePanel({ uploadedFiles, onFileUploaded }: AIKn
 
   return (
     <div className="space-y-6">
-      {/* AI Knowledge Status */}
-      <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-100">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="text-2xl">🧠</div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">AI Knowledge Base</h3>
-            <p className="text-sm text-gray-600">Feed me documents to expand my knowledge</p>
-          </div>
-        </div>
+      {/* Knowledge Status */}
+      <div className="bg-white rounded-lg p-4 border border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Knowledge Base</h3>
         
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white rounded-lg p-3 border border-purple-200">
-            <div className="text-2xl font-bold text-purple-600">{uploadedFiles.length}</div>
+          <div className="bg-gray-50 rounded p-3">
+            <div className="text-xl font-bold text-gray-900">{uploadedFiles.length}</div>
             <div className="text-xs text-gray-600">Documents</div>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-blue-200">
-            <div className="text-2xl font-bold text-blue-600">{getTotalKnowledgeChunks()}</div>
-            <div className="text-xs text-gray-600">Knowledge Chunks</div>
+          <div className="bg-gray-50 rounded p-3">
+            <div className="text-xl font-bold text-gray-900">{getTotalKnowledgeChunks()}</div>
+            <div className="text-xs text-gray-600">Chunks</div>
           </div>
         </div>
       </div>
 
-      {/* AI Document Upload */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-        <div className="p-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <span className="text-xl">📄</span>
-            <h3 className="text-lg font-semibold text-gray-900">Feed AI New Knowledge</h3>
-          </div>
+      {/* Document Upload */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Documents</h3>
           
           <div
-            className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+            className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
               dragActive
-                ? 'border-blue-400 bg-blue-50 scale-105'
+                ? 'border-blue-400 bg-blue-50'
                 : 'border-gray-300 hover:border-gray-400'
             } ${isUploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer hover:bg-gray-50'}`}
             onDragEnter={handleDrag}
@@ -167,76 +158,68 @@ export default function AIKnowledgePanel({ uploadedFiles, onFileUploaded }: AIKn
               disabled={isUploading}
             />
             
-            <div className="space-y-3">
-              {isUploading ? (
-                <>
-                  <div className="text-4xl animate-spin">🧠</div>
-                  <div className="text-sm text-gray-600">
-                    <p className="font-medium">AI is processing...</p>
-                    <p className="text-xs">Analyzing and chunking your document</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="text-4xl">{dragActive ? '🎯' : '📁'}</div>
-                  <div className="text-sm text-gray-600">
-                    <p className="font-medium">Drop files here or click to browse</p>
-                    <p className="text-xs mt-1">
-                      AI supports: {SUPPORTED_FILE_TYPES.slice(0, 5).join(', ').toUpperCase()}
-                    </p>
-                    <p className="text-xs">Max size: {MAX_FILE_SIZE / 1024 / 1024}MB</p>
-                  </div>
-                </>
-              )}
-            </div>
+            {isUploading ? (
+              <div className="space-y-2">
+                <div className="text-3xl">📄</div>
+                <div className="text-sm text-gray-600">
+                  <p className="font-medium">Processing...</p>
+                  <p className="text-xs">Analyzing document</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="text-3xl">📄</div>
+                <div className="text-sm text-gray-600">
+                  <p className="font-medium">Drop files here or click to browse</p>
+                  <p className="text-xs mt-1">
+                    Supported: {SUPPORTED_FILE_TYPES.slice(0, 5).join(', ').toUpperCase()}
+                  </p>
+                  <p className="text-xs">Max size: {MAX_FILE_SIZE / 1024 / 1024}MB</p>
+                </div>
+              </div>
+            )}
           </div>
           
           {uploadStatus.type && (
-            <div className={`mt-4 p-3 rounded-lg text-sm border ${
+            <div className={`mt-4 p-3 rounded text-sm ${
               uploadStatus.type === 'success' 
-                ? 'bg-green-50 text-green-800 border-green-200'
+                ? 'bg-green-50 text-green-800'
                 : uploadStatus.type === 'processing'
-                ? 'bg-blue-50 text-blue-800 border-blue-200'
-                : 'bg-red-50 text-red-800 border-red-200'
+                ? 'bg-blue-50 text-blue-800'
+                : 'bg-red-50 text-red-800'
             }`}>
-              {uploadStatus.message}
+              {uploadStatus.message.replace(/[🧠✅❌]/g, '').trim()}
             </div>
           )}
         </div>
       </div>
 
-      {/* AI Knowledge Library */}
+      {/* Uploaded Files */}
       {uploadedFiles.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
-          <div className="p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <span className="text-xl">🗃️</span>
-              <h3 className="text-lg font-semibold text-gray-900">AI Knowledge Library</h3>
-            </div>
+        <div className="bg-white rounded-lg border border-gray-200">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h3>
             
-            <div className="space-y-3 max-h-60 overflow-y-auto">
+            <div className="space-y-2 max-h-60 overflow-y-auto">
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className="p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                  className="p-3 bg-gray-50 rounded border"
                 >
-                  <div className="flex items-start space-x-3">
-                    <div className="text-lg">📄</div>
+                  <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-gray-900 truncate text-sm">
                         {file.name}
                       </div>
-                      <div className="text-gray-500 text-xs mt-1 flex items-center space-x-2">
-                        <span>🧩 {file.chunksCreated} chunks</span>
-                        <span>•</span>
-                        <span>📅 {new Date(file.uploadedAt).toLocaleDateString()}</span>
-                      </div>
                       <div className="text-gray-500 text-xs mt-1">
-                        💾 {(file.size / 1024).toFixed(1)}KB
+                        {file.chunksCreated} chunks • {(file.size / 1024).toFixed(1)}KB
+                      </div>
+                      <div className="text-gray-500 text-xs">
+                        {new Date(file.uploadedAt).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className="text-green-500 text-sm">
-                      ✅
+                    <div className="text-green-600 text-sm ml-2">
+                      ✓
                     </div>
                   </div>
                 </div>
@@ -246,31 +229,6 @@ export default function AIKnowledgePanel({ uploadedFiles, onFileUploaded }: AIKn
         </div>
       )}
 
-      {/* AI Capabilities */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
-        <div className="flex items-center space-x-2 mb-3">
-          <span className="text-xl">⚡</span>
-          <h3 className="text-lg font-semibold text-gray-900">AI Capabilities</h3>
-        </div>
-        <div className="space-y-2 text-sm text-gray-700">
-          <div className="flex items-center space-x-2">
-            <span className="text-green-500">✓</span>
-            <span>Document analysis & summarization</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-green-500">✓</span>
-            <span>Intelligent question answering</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-green-500">✓</span>
-            <span>Cross-document insights</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-green-500">✓</span>
-            <span>Multiple reasoning modes</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
