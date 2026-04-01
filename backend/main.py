@@ -1,12 +1,30 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 from rag_service import answer_research_question
 from cache import cache
 import os
 import uuid
+from dotenv import load_dotenv
 
-app = FastAPI(title="Research Assistant API")
+# Load environment variables
+load_dotenv()
+
+app = FastAPI(
+    title="Research Assistant API",
+    description="A RAG-powered research assistant API",
+    version="1.0.0",
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(","),
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 
 class ResearchRequest(BaseModel):
     question: str
@@ -123,4 +141,20 @@ async def health_check():
     
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # Configuration from environment variables
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", 8000))
+    reload = os.getenv("ENV", "production").lower() == "development"
+    
+    print(f"🚀 Starting RAG Research Assistant Backend on {host}:{port}")
+    if reload:
+        print("📝 Development mode: auto-reload enabled")
+    
+    uvicorn.run(
+        "main:app" if reload else app,
+        host=host,
+        port=port,
+        reload=reload,
+        access_log=True
+    )

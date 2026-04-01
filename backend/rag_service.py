@@ -50,11 +50,11 @@ def answer_research_question(query: str, mode: str = "research"):
     formatting_instructions = """
 You are an expert content formatter. All your outputs must strictly follow these rules:
 
-1. **Headings**  
+1. Headings  
    - Use Markdown-style headings only: `#` for main titles, `##` for subheadings.  
    - No deeper levels unless explicitly asked.
 
-2. **Bulleted Lists**  
+2. Bulleted Lists  
    - Use emoji bullets before each item. Examples:  
      - ✅ for completed tasks or confirmed facts
      - 🔥 for priorities or urgent points  
@@ -65,20 +65,20 @@ You are an expert content formatter. All your outputs must strictly follow these
    - Keep each bullet concise (one sentence or phrase).  
    - Maximum 5 bullets per list unless instructed otherwise.  
 
-3. **Numbered Lists**  
+3. Numbered Lists  
    - Only when explicitly requested. Numbers followed by period and space: `1. Item`.  
 
-4. **Inline Styling**  
-   - Bold important words with `**bold**`.  
-   - Italics only for emphasis with `*italics*`.  
+4. Inline Styling  
+   - Bold important words with `bold`.  
+   - Italics only for emphasis with `italics`.  
 
-5. **Output Structure**  
+5. Output Structure  
    - Begin with a main title `#`  
    - Follow with `##` subheadings  
    - Under each subheading, include properly formatted bullet lists with emojis.  
    - No extra text outside headings or bullets unless instructed.
 
-6. **Tone**  
+6. Tone  
    - Keep tone professional, clear, and readable.
 
 Always follow this format exactly unless instructed otherwise.
@@ -94,7 +94,7 @@ Research Context:
 
 Researcher's Question: {question}
 
-**Instructions**: Provide a **precise research answer** based on the context above. Format your response with:
+Instructions: Provide a precise research answer based on the context above. Format your response with:
 - A clear main heading for your answer
 - Subheadings for different aspects
 - Emoji bullet points for key findings
@@ -113,12 +113,12 @@ Context Material:
 
 User's Request: {question}
 
-**Instructions**: Create an **engaging and creative response** that goes beyond basic facts. Format your response with:
+Instructions: Create an engaging and creative response that goes beyond basic facts. Format your response with:
 - An inspiring main heading
 - Creative subheadings that tell a story
 - 💡 bullets for innovative ideas and insights
 - 🎨 bullets for creative interpretations
-- **Bold** key concepts and creative connections
+- Bold key concepts and creative connections
 
 Feel free to be elaborate and make reasonable inferences while staying grounded in the source material.
 Make your response engaging and detailed.
@@ -132,12 +132,12 @@ Context:
 
 User says: {question}
 
-**Instructions**: Respond in a **friendly, conversational tone** while maintaining professional formatting:
+Instructions: Respond in a friendly, conversational tone while maintaining professional formatting:
 - Use a welcoming main heading
 - Organize thoughts with conversational subheadings
 - 💬 bullets for main conversation points
 - 🤝 bullets for helpful suggestions
-- **Bold** important points naturally
+- Bold important points naturally
 
 You can go beyond the strict context when it makes the conversation more natural.
 If the context doesn't cover what they're asking, use ⚠️ bullets to explain and offer alternatives.
@@ -151,13 +151,13 @@ Context Data:
 
 Analytical Question: {question}
 
-**Instructions**: Provide a **detailed analytical breakdown** with structured formatting:
+Instructions: Provide a detailed analytical breakdown with structured formatting:
 - Clear analytical heading
 - Systematic subheadings for different analysis aspects
 - 📊 bullets for data points and statistics
 - 🎯 bullets for key insights and patterns
 - ⚠️ bullets for limitations or gaps in information
-- **Bold** critical findings and metrics
+- Bold critical findings and metrics
 
 Be thorough and systematic in your analysis, addressing all aspects of the question.
 """,
@@ -170,13 +170,13 @@ Study Materials:
 
 Student's Question: {question}
 
-**Instructions**: Create a **comprehensive educational response** formatted for learning:
+Instructions: Create a comprehensive educational response formatted for learning:
 - Encouraging main heading that welcomes the student
 - Clear subheadings for different learning concepts
 - ✅ bullets for confirmed facts and completed steps
 - 💡 bullets for key learning points and insights
 - 🎓 bullets for educational tips and study suggestions
-- **Bold** important terms and concepts that students should remember
+- Bold important terms and concepts that students should remember
 
 Explain concepts step-by-step, provide examples when helpful, and make learning engaging.
 End with encouragement and potential follow-up questions.
