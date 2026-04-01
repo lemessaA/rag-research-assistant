@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { api, APIError } from '@/lib/api';
 import { ResearchMode, ResearchResponse, UploadedFile } from '@/types';
-import { RESEARCH_MODES } from '@/lib/constants';
+import { RESEARCH_MODES, SUPPORTED_FILE_TYPES, MAX_FILE_SIZE } from '@/lib/constants';
 import { useSmartSuggestions, SuggestionContext } from '@/lib/smartSuggestions';
 
 interface ChatMessage {
@@ -18,9 +18,10 @@ interface ChatMessage {
 
 interface AIChatProps {
   uploadedFiles: UploadedFile[];
+  onFileUploaded: (file: UploadedFile) => void;
 }
 
-export default function AIChat({ uploadedFiles }: AIChatProps) {
+export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -33,8 +34,11 @@ export default function AIChat({ uploadedFiles }: AIChatProps) {
   const [selectedMode, setSelectedMode] = useState<ResearchMode>('research');
   const [isLoading, setIsLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Smart Suggestion System
   const suggestionContext: SuggestionContext = useMemo(() => {
@@ -151,8 +155,59 @@ export default function AIChat({ uploadedFiles }: AIChatProps) {
 
   const selectedModeInfo = RESEARCH_MODES.find(mode => mode.value === selectedMode);
 
+  // File upload handling
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    setUploadStatus('Processing...');
+
+    try {
+      const result = await api.uploadFile(file);
+      
+      const uploadedFile: UploadedFile = {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date().toISOString(),
+        chunksCreated: result.chunks_created,
+      };
+      
+      onFileUploaded(uploadedFile);
+      setUploadStatus(`✅ ${file.name} processed successfully`);
+      
+      // Add system message
+      const systemMessage: ChatMessage = {
+        id: `file-${Date.now()}`,
+        type: 'system',
+        content: `📄 Document processed: ${file.name} (${result.chunks_created} chunks). Ready for questions!`,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, systemMessage]);
+
+      // Clear status after 3 seconds
+      setTimeout(() => setUploadStatus(''), 3000);
+      
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      if (error instanceof APIError) {
+        setUploadStatus(`❌ Upload failed: ${error.message}`);
+      } else {
+        setUploadStatus('❌ Network error. Check backend connection.');
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[calc(100vh-160px)] flex flex-col">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[calc(100vh-120px)] flex flex-col">
       {/* Header */}
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
