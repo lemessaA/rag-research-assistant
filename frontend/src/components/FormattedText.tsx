@@ -12,44 +12,36 @@ const FormattedText = memo(({ content, className = '' }: FormattedTextProps) => 
   const structured = parseStructuredResponse(content);
 
   return (
-    <div className={`formatted-text ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       {structured.map((item, index) => {
         switch (item.type) {
           case 'heading':
-            return (
-              <h1 key={index} className="text-xl font-bold mb-3 mt-2 border-b border-current/20 pb-2">
-                {item.content}
-              </h1>
-            );
-          
           case 'subheading':
             return (
-              <h2 key={index} className={`font-semibold mb-2 mt-4 ${
-                item.level === 2 ? 'text-lg' : 'text-base'
-              }`}>
+              <div key={index} className="font-semibold text-current mt-2">
                 {item.content}
-              </h2>
+              </div>
             );
           
           case 'bullet':
             return (
-              <div key={index} className="flex items-start space-x-2 mb-2">
-                <span className="text-base flex-shrink-0 mt-0.5">{item.emoji}</span>
-                <span className="leading-relaxed">
+              <div key={index} className="flex items-start space-x-2 text-current">
+                <span className="flex-shrink-0">{item.emoji}</span>
+                <div className="leading-relaxed">
                   {item.content.split('**').map((part, i) => 
-                    i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+                    i % 2 === 1 ? <span key={i} className="font-medium">{part}</span> : part
                   )}
-                </span>
+                </div>
               </div>
             );
           
           case 'paragraph':
             return (
-              <p key={index} className="mb-3 leading-relaxed">
+              <div key={index} className="leading-relaxed text-current">
                 {item.content.split('**').map((part, i) => 
-                  i % 2 === 1 ? <strong key={i} className="font-semibold">{part}</strong> : part
+                  i % 2 === 1 ? <span key={i} className="font-medium">{part}</span> : part
                 )}
-              </p>
+              </div>
             );
           
           default:
