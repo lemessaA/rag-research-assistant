@@ -5,6 +5,7 @@ import { api, APIError } from '@/lib/api';
 import { ResearchMode, ResearchResponse, UploadedFile } from '@/types';
 import { RESEARCH_MODES, SUPPORTED_FILE_TYPES, MAX_FILE_SIZE } from '@/lib/constants';
 import { useSmartSuggestions, SuggestionContext } from '@/lib/smartSuggestions';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface ChatMessage {
   id: string;
@@ -306,9 +307,10 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
                           </div>
                         ) : (
                           <>
-                            <div className="prose prose-sm max-w-none text-gray-900">
-                              {message.content}
-                            </div>
+                            <MarkdownRenderer 
+                              content={message.content}
+                              className="max-w-none"
+                            />
                             
                             {message.sources && message.sources.length > 0 && (
                               <div className="mt-4 pt-3 border-t border-gray-300">

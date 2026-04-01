@@ -59,6 +59,83 @@
   .suggestion-category-button {
     @apply w-full text-xs p-2 rounded-md transition-all duration-200 text-left border hover:shadow-sm transform hover:scale-[1.02] disabled:opacity-50;
   }
+
+  /* Markdown content styling */
+  .markdown-content {
+    line-height: 1.7;
+  }
+  
+  .markdown-content h1 {
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+  
+  .markdown-content h2 {
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 4px;
+  }
+  
+  .markdown-content ul {
+    list-style: none;
+  }
+  
+  .markdown-content li {
+    position: relative;
+    padding-left: 0;
+  }
+  
+  /* Ensure emojis in markdown are properly displayed */
+  .markdown-content li:has-text("✅"),
+  .markdown-content li:has-text("🔥"),
+  .markdown-content li:has-text("💡"),
+  .markdown-content li:has-text("📊"),
+  .markdown-content li:has-text("⚠️"),
+  .markdown-content li:has-text("🎯") {
+    display: flex;
+    align-items: flex-start;
+  }
+}
+
+/* Custom prose styling for chat messages */
+.chat-prose {
+  @apply text-gray-700;
+}
+
+.chat-prose h1 {
+  @apply text-xl font-bold text-gray-900 mb-3 mt-2 border-b border-gray-200 pb-2;
+}
+
+.chat-prose h2 {
+  @apply text-lg font-semibold text-gray-800 mb-2 mt-3;
+}
+
+.chat-prose h3 {
+  @apply text-base font-medium text-gray-700 mb-2 mt-2;
+}
+
+.chat-prose ul {
+  @apply space-y-1 mb-3;
+  list-style: none;
+}
+
+.chat-prose li {
+  @apply text-gray-700 leading-relaxed;
+}
+
+.chat-prose p {
+  @apply text-gray-700 mb-2 leading-relaxed;
+}
+
+.chat-prose strong {
+  @apply font-semibold text-gray-900;
+}
+
+.chat-prose em {
+  @apply italic text-gray-600;
+}
+
+.chat-prose code {
+  @apply bg-gray-200 px-1 py-0.5 rounded text-sm font-mono;
 }
 
 /* Custom scrollbar */
