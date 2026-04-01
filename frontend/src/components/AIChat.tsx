@@ -26,7 +26,7 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
     {
       id: 'welcome',
       type: 'assistant',
-      content: "Welcome to your research assistant. Upload documents and ask questions to get started.",
+      content: "Welcome to your research assistant. Use the Upload button above to add documents, then ask questions to get started.",
       timestamp: new Date().toISOString(),
     }
   ]);
@@ -211,12 +211,27 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
       {/* Header */}
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">Research Chat</h2>
+          <div className="flex items-center space-x-4">
+            <h2 className="text-lg font-semibold text-gray-900">Research Chat</h2>
+
+            {/* File Count */}
+            {uploadedFiles.length > 0 && (
+              <div className="flex items-center space-x-1 text-sm text-gray-600">
+                <span>📄</span>
+                <span>{uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''}</span>
+                <span className="text-xs text-gray-400">
+                  ({uploadedFiles.reduce((total, file) => total + (file.chunksCreated || 0), 0)} chunks)
+                </span>
+              </div>
+            )}
+          </div>
+          
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span>Connected</span>
           </div>
         </div>
+
         <select
           value={selectedMode}
           onChange={(e) => setSelectedMode(e.target.value as ResearchMode)}

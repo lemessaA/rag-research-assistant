@@ -201,21 +201,21 @@ class SmartSuggestionEngine {
 
   private greetingSuggestions: SmartSuggestion[] = [
     {
+      text: "Use the Upload button above to add your first document",
+      category: 'practical',
+      mode: 'conversational',
+      icon: '📁',
+      priority: 8
+    },
+    {
       text: "What can you help me discover about my documents?",
       category: 'analysis',
       mode: 'conversational',
       icon: '🤖',
-      priority: 8
-    },
-    {
-      text: "Show me the most interesting insights from my knowledge base",
-      category: 'analysis',
-      mode: 'research',
-      icon: '✨',
       priority: 7
     },
     {
-      text: "What questions should I be asking about my uploaded content?",
+      text: "What types of documents can I upload for analysis?",
       category: 'practical',
       mode: 'conversational',
       icon: '❓',
