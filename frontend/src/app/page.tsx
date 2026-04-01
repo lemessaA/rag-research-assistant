@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import AIChat from '@/components/AIChat';
+import ChatGPTInterface from '@/components/ChatGPTInterface';
 import { UploadedFile } from '@/types';
 
 export default function HomePage() {
@@ -12,14 +12,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        {/* Full Page Chat Interface */}
-        <AIChat 
-          uploadedFiles={uploadedFiles} 
-          onFileUploaded={handleFileUploaded}
-        />
-      </div>
+    <div className="h-screen bg-gray-50">
+      <ChatGPTInterface 
+        uploadedFiles={uploadedFiles} 
+        onFileUploaded={handleFileUploaded}
+      />
     </div>
   );
 }

@@ -36,6 +36,7 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
   const [isThinking, setIsThinking] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [dragActive, setDragActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,18 +75,6 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (uploadedFiles.length > 0) {
-      const latestFile = uploadedFiles[uploadedFiles.length - 1];
-      const systemMessage: ChatMessage = {
-        id: `file-${Date.now()}`,
-        type: 'system',
-        content: `📄 Document processed: ${latestFile.name} (${latestFile.chunksCreated} chunks). I'm ready to answer questions about it!`,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, systemMessage]);
-    }
-  }, [uploadedFiles]);
 
   const handleSubmit = async (questionText?: string) => {
     const question = questionText || input.trim();
@@ -174,14 +163,13 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
       onFileUploaded(uploadedFile);
       setUploadStatus(`✅ ${file.name} processed successfully`);
       
-      // Add system message
-      const systemMessage: ChatMessage = {
-        id: `file-${Date.now()}`,
-        type: 'system',
-        content: `📄 Document processed: ${file.name} (${result.chunks_created} chunks). Ready for questions!`,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, systemMessage]);
+      // Update welcome message if it's still the only message
+      if (messages.length === 1 && messages[0].id === 'welcome') {
+        setMessages([{
+          ...messages[0],
+          content: `Document "${file.name}" uploaded successfully. You can now ask questions about your documents.`
+        }]);
+      }
 
       // Clear status after 3 seconds
       setTimeout(() => setUploadStatus(''), 3000);
@@ -203,6 +191,26 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       handleFileUpload(e.target.files[0]);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
     }
   };
 
@@ -247,7 +255,14 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages.length === 1 && uploadedFiles.length === 0 ? (
+          <div className="text-center text-gray-500 py-12">
+            <div className="text-4xl mb-4">💬</div>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">Ready to Research</h3>
+            <p className="text-sm">Upload documents below and ask questions to get started</p>
+          </div>
+        ) : (
+          messages.map((message) => (
           <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-4xl rounded-lg p-4 ${
               message.type === 'user'
@@ -324,7 +339,8 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
               </div>
             </div>
           </div>
-        ))}
+          ))
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -409,8 +425,65 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
         </div>
       )}
 
-      {/* Input Area */}
-      <div className="border-t border-gray-200 p-4">
+      {/* Input & Upload Area */}
+      <div className="border-t border-gray-200 p-4 space-y-4">
+        {/* Upload Status */}
+        {uploadStatus && (
+          <div className="p-3 bg-blue-50 text-blue-800 text-sm rounded border border-blue-200">
+            {uploadStatus}
+          </div>
+        )}
+
+        {/* File Upload Section */}
+        <div className="border border-gray-200 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-700">Upload Document</span>
+            <span className="text-xs text-gray-500">
+              {SUPPORTED_FILE_TYPES.slice(0, 3).join(', ').toUpperCase()} + more
+            </span>
+          </div>
+          
+          <div 
+            className="relative"
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileInputChange}
+              accept={SUPPORTED_FILE_TYPES.map(type => `.${type}`).join(',')}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              disabled={isUploading}
+            />
+            <div className={`w-full p-2 border border-dashed rounded text-center transition-colors cursor-pointer ${
+              dragActive
+                ? 'border-blue-400 bg-blue-50'
+                : isUploading 
+                ? 'border-blue-300 bg-blue-50 opacity-50' 
+                : 'border-gray-300 hover:border-blue-400'
+            }`}>
+              {isUploading ? (
+                <div className="flex items-center justify-center space-x-2 text-sm text-blue-600">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                  <span>Processing...</span>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-600">
+                  {dragActive ? (
+                    <span className="text-blue-600">Drop file here</span>
+                  ) : (
+                    <span>Browse or drag files here</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Question Input */}
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="flex space-x-3">
           <input
             ref={inputRef}
