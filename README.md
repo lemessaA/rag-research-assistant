@@ -1,220 +1,286 @@
 # RAG Research Assistant
 
-A FastAPI-based Research Assistant with RAG (Retrieval-Augmented Generation) capabilities and Streamlit UI.
+A professional, production-ready Retrieval-Augmented Generation (RAG) system with separated backend and frontend services.
 
-## Features
+This application allows users to upload documents and ask questions about them using advanced AI models. It combines document processing, vector storage, semantic search, and intelligent question answering.
 
-- 📄 **Document Upload**: Support for PDF, TXT, Markdown, Word, Excel, PowerPoint, and HTML files
-- 🔍 **Intelligent Search**: RAG-powered question answering
-- 🎨 **Beautiful UI**: Streamlit interface for easy interaction
-- 📚 **Source Citations**: Answers include source references with relevance scores
-- 🚀 **FastAPI Backend**: High-performance API with automatic documentation
+## 🏗️ Architecture
+
+The system is built with a microservices architecture:
+
+- **Backend**: FastAPI-based REST API with document processing and AI capabilities
+- **Frontend**: Modern Next.js React application with responsive UI  
+- **Database**: ChromaDB for vector storage and Redis for caching
+- **Deployment**: Docker containers with Docker Compose orchestration
+
+## ✨ Features
+
+### Backend Features
+- 📄 **Document Processing**: Support for PDF, DOCX, TXT, MD, XLSX, PPTX, HTML files
+- 🤖 **AI-Powered Q&A**: Multiple response modes (research, creative, conversational, analytical, tutor)
+- 💾 **Vector Storage**: ChromaDB for efficient document retrieval
 - ⚡ **Redis Caching**: Fast caching for embeddings, search results, and LLM responses
+- 🔧 **Auto Documentation**: OpenAPI/Swagger docs at `/docs`
+- 📊 **Monitoring**: Health checks and cache statistics
 
-## Quick Start
+### Frontend Features
+- ⚡ **Next.js 14**: Modern React framework with App Router
+- 🎨 **Beautiful UI**: Tailwind CSS with responsive design
+- 📤 **Drag & Drop**: Intuitive file upload with progress indicators
+- 💬 **Chat Interface**: Real-time conversation with message history
+- 🎯 **Response Modes**: Toggle between different AI response styles
+- 📱 **Mobile Friendly**: Responsive design for all devices
 
-### 1. Setup Environment
+## 🚀 Quick Start
 
+### Option 1: Development Mode (Recommended)
 ```bash
 # Clone the repository
-git clone https://github.com/lemessaA/fastapi.git
-cd fastapi
+git clone <repository-url>
+cd rag-research-assistant
 
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Run the development setup script
+chmod +x start-dev.sh
+./start-dev.sh
 
-# Install dependencies
+# Choose option 3 to start both services
+```
+
+### Option 2: Docker Compose (Production-like)
+```bash
+# Copy environment files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+
+# Edit backend/.env with your OpenAI API key
+# OPENAI_API_KEY=your_key_here
+
+# Start all services
+docker-compose up --build
+
+# Services will be available at:
+# Frontend: http://localhost:3000
+# Backend: http://localhost:8000
+# Backend Docs: http://localhost:8000/docs
+```
+
+### Option 3: Manual Setup
+
+#### Backend Setup
+```bash
+cd backend
+
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start backend
+python start-dev.py
+# Backend available at http://localhost:8000
 ```
 
-### 2. Set Up Environment Variables
+#### Frontend Setup
+```bash
+cd frontend
 
-Create a `.env` file in the root directory:
+# Install Node.js dependencies
+npm install
 
+# Copy and configure environment
+cp .env.example .env.local
+# Edit .env.local if backend URL differs
+
+# Start frontend
+npm run dev
+# Frontend available at http://localhost:3000
+```
+
+## 📁 Project Structure
+
+```
+rag-research-assistant/
+├── backend/                 # FastAPI backend service
+│   ├── main.py             # FastAPI application
+│   ├── rag_service.py      # Core RAG functionality
+│   ├── database.py         # Vector database operations
+│   ├── cache.py            # Redis caching
+│   ├── requirements.txt    # Python dependencies
+│   ├── Dockerfile          # Backend container
+│   └── start-dev.py        # Development server
+├── frontend/               # Next.js frontend service
+│   ├── src/
+│   │   ├── app/           # Next.js app router
+│   │   ├── components/    # React components
+│   │   ├── lib/          # API client and utilities
+│   │   └── types/        # TypeScript definitions
+│   ├── package.json       # Node.js dependencies
+│   ├── Dockerfile         # Frontend container
+│   └── start-dev.js       # Development server
+├── docker-compose.yml     # Multi-service deployment
+├── start-dev.sh          # Development startup script
+└── README.md             # This file
+```
+
+## 🔧 Configuration
+
+### Backend Environment Variables
 ```env
-GROQ_API_KEY="your_groq_api_key_here"
-REDIS_URL=redis://localhost:6379
+# Backend Configuration
+HOST=0.0.0.0
+PORT=8000
+ENV=production
+
+# CORS Configuration  
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Redis Configuration (optional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
-Get your API key from [Groq Console](https://console.groq.com/).
+### Frontend Environment Variables
+```env
+# Frontend Configuration
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+```
 
-### 3. Set Up Redis (Optional but Recommended)
+## 🎯 Response Modes
 
-Redis provides caching for better performance. Run the setup helper:
+Choose from different AI response styles:
 
+- 🔬 **Research**: Precise, context-based answers with citations
+- 🎨 **Creative**: Elaborate and engaging responses with storytelling
+- 💬 **Conversational**: Friendly, natural dialogue style
+- 📊 **Analytical**: Detailed breakdown with structured insights
+- 👨‍🏫 **Tutor**: Educational, step-by-step explanations
+
+## 📤 Supported File Types
+
+- **Text Files**: `.txt`, `.md`
+- **Documents**: `.pdf`, `.docx`, `.doc`
+- **Spreadsheets**: `.xlsx`, `.xls`
+- **Presentations**: `.pptx`, `.ppt`
+- **Web Files**: `.html`, `.htm`
+
+Maximum file size: 10MB
+
+## 🚢 Deployment
+
+### Docker Deployment
 ```bash
-python redis_setup.py
+# Production deployment with Docker Compose
+docker-compose -f docker-compose.yml up -d
+
+# Scale services if needed
+docker-compose up -d --scale backend=2
 ```
 
-Or install and start Redis manually:
+### Cloud Deployment
 
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install redis-server
-sudo systemctl start redis-server
-```
+#### Backend (FastAPI)
+- **Railway**: Connect GitHub repo, add environment variables
+- **Heroku**: Use Procfile: `web: python main.py`
+- **AWS ECS**: Use backend/Dockerfile
+- **Google Cloud Run**: Deploy container directly
 
-**macOS:**
-```bash
-brew install redis
-brew services start redis
-```
+#### Frontend (Next.js)
+- **Vercel** (Recommended): Connect GitHub repo, auto-deploy
+- **Netlify**: Deploy with build command `npm run build`
+- **AWS Amplify**: Connect repository for auto-deployment
 
-**Test Redis:**
-```bash
-redis-cli ping  # Should respond with "PONG"
-```
+## 🔍 API Documentation
 
-### 3. Populate Initial Data
-
-```bash
-python setup_data.py
-```
-
-### 4. Start the Backend Server
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at:
-- **API Docs**: http://localhost:8000/docs
+When the backend is running, visit:
+- **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-### 5. Start the Streamlit UI
+### Key Endpoints
 
-In a new terminal:
+- `POST /research` - Ask research questions
+- `POST /upload` - Upload documents
+- `GET /health` - Health check
+- `GET /cache/stats` - Cache statistics
+- `POST /cache/clear` - Clear cache
 
+## 🔧 Development
+
+### Backend Development
 ```bash
-source .venv/bin/activate
-streamlit run streamlit_app.py
+cd backend
+python start-dev.py  # Auto-reload enabled
 ```
 
-The UI will be available at http://localhost:8501
-
-## Caching with Redis
-
-Redis caching significantly improves performance by storing:
-
-- **Embeddings**: Text embeddings are cached for 24 hours
-- **Search Results**: Vector search results cached for 30 minutes  
-- **LLM Responses**: Generated answers cached for 30 minutes
-
-### Cache Management
-
-**View cache statistics:**
+### Frontend Development
 ```bash
-curl http://localhost:8000/cache/stats
+cd frontend
+npm run dev  # Hot reloading enabled
 ```
-
-**Clear all cached data:**
-```bash
-curl -X POST http://localhost:8000/cache/clear
-```
-
-**Benefits:**
-- ⚡ Faster response times for repeated queries
-- 💰 Reduced API costs (fewer LLM calls)
-- 🔄 Better user experience
-- 📊 Cache hit statistics available via API
-
-## Usage
-
-### Via Streamlit UI (Recommended)
-
-1. Open http://localhost:8501 in your browser
-2. Upload documents using the file uploader
-3. Ask questions about your documents
-4. View answers with source citations
-
-### Via API
-
-**Upload a document:**
-```bash
-curl -X POST "http://localhost:8000/upload" \
--F "file=@your_document.pdf"
-```
-
-**Ask a question:**
-```bash
-curl -X POST "http://localhost:8000/research" \
--H "Content-Type: application/json" \
--d '{"question": "What is Machine Learning?"}'
-```
-
-## API Endpoints
-
-- `GET /` - Health check
-- `POST /research` - Ask questions about documents
-- `POST /upload` - Upload and process documents
-- `POST /cache/clear` - Clear all cached data
-- `GET /cache/stats` - Get cache statistics
-
-## Supported File Formats
-
-- **PDF** (.pdf)
-- **Text** (.txt)
-- **Markdown** (.md)
-- **Word** (.docx, .doc)
-- **Excel** (.xlsx, .xls)
-- **PowerPoint** (.pptx, .ppt)
-- **HTML** (.html, .htm)
-
-## Architecture
-
-```
-├── main.py              # FastAPI application
-├── rag_service.py       # RAG logic and LLM integration
-├── database.py          # Vector database setup
-├── cache.py             # Redis caching layer
-├── setup_data.py        # Initial data ingestion
-├── redis_setup.py       # Redis setup helper
-├── streamlit_app.py     # Streamlit UI
-├── requirements.txt     # Python dependencies
-└── sample_data/         # Sample documents
-```
-
-## Technology Stack
-
-- **Backend**: FastAPI, Uvicorn
-- **Frontend**: Streamlit
-- **Vector Database**: ChromaDB
-- **Cache**: Redis
-- **Embeddings**: HuggingFace Transformers
-- **LLM**: Groq (Llama models)
-- **Document Processing**: LangChain
-
-## Development
 
 ### Running Tests
-
 ```bash
-python test_app.py        # Test API endpoints
-python test_upload.py    # Test file upload
+# Backend tests
+cd backend && python -m pytest test_*.py
+
+# Frontend tests (if added)
+cd frontend && npm test
 ```
 
-### Adding New Features
+## 📊 Performance
 
-1. Backend changes go in `main.py` or `rag_service.py`
-2. UI changes go in `streamlit_app.py`
-3. New document loaders can be added to `rag_service.py`
+- **Caching**: Redis caching for embeddings, search results, and AI responses
+- **Vector Search**: Efficient ChromaDB similarity search
+- **Async Processing**: FastAPI async endpoints for better concurrency
+- **Code Splitting**: Next.js automatic code splitting
+- **Image Optimization**: Next.js built-in image optimization
 
-## Troubleshooting
+## 🛠️ Troubleshooting
 
-**Backend not connecting:**
-- Make sure the FastAPI server is running on port 8000
-- Check that all dependencies are installed
+### Common Issues
 
-**Upload issues:**
-- Verify file format is supported
-- Check file size (large files may take time to process)
+1. **Backend not starting**
+   - Check Python version (3.8+ required)
+   - Verify OpenAI API key in `.env`
+   - Check if port 8000 is available
 
-**Poor answer quality:**
-- Upload more relevant documents
-- Try rephrasing your question
-- Check that documents contain relevant information
+2. **Frontend connection issues**
+   - Verify `NEXT_PUBLIC_BACKEND_URL` in `.env.local`
+   - Check if backend is running on correct port
+   - Review CORS settings in backend
 
-## License
+3. **File upload failures**
+   - Check file size (max 10MB)
+   - Verify file type is supported
+   - Ensure uploads directory exists and is writable
 
-This project is open source and available under the [MIT License](LICENSE).
+4. **Redis connection issues**
+   - Redis is optional - app works without it
+   - Check Redis host/port in backend `.env`
+   - Use Docker Compose for automatic Redis setup
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License. See LICENSE file for details.
+
+## 🆘 Support
+
+- Create an issue for bug reports
+- Check the documentation in `/docs` endpoints
+- Review component READMEs in `backend/` and `frontend/` directories
+
+---
+
+Built with ❤️ using FastAPI, Next.js, ChromaDB, and OpenAI
