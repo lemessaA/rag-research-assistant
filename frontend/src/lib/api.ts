@@ -1,6 +1,9 @@
 import { ResearchRequest, ResearchResponse, UploadResponse } from '@/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || '/api';
+const API_BASE =
+  process.env.NODE_ENV === 'development'
+    ? process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000'
+    : '/api';
 
 class APIError extends Error {
   constructor(public status: number, message: string) {

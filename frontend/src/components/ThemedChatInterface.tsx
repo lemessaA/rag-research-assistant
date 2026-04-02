@@ -127,7 +127,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
       lastUserQuestion: lastUserMessage?.content,
       currentMode: selectedMode,
       hasMultipleFiles: uploadedFiles.length > 1,
-      fileTypes: [...new Set(fileTypes)],
+      fileTypes: Array.from(new Set(fileTypes)),
       timeOfDay: timeOfDay as 'morning' | 'afternoon' | 'evening'
     };
   }, [uploadedFiles, messages, selectedMode]);

@@ -181,18 +181,37 @@ docker-compose -f docker-compose.yml up -d
 docker-compose up -d --scale backend=2
 ```
 
-### Cloud Deployment
+### Render + Vercel
 
-#### Backend (FastAPI)
-- **Railway**: Connect GitHub repo, add environment variables
-- **Heroku**: Use Procfile: `web: python main.py`
-- **AWS ECS**: Use backend/Dockerfile
-- **Google Cloud Run**: Deploy container directly
+#### Backend on Render
+1. Push this repo to GitHub.
+2. In Render, create a new Blueprint or Web Service from the repo.
+3. If you use the Blueprint flow, Render will pick up `render.yaml` automatically and deploy the `backend` service.
+4. Set `GROQ_API_KEY` in Render before the first deploy.
+5. Keep the persistent disk enabled so Chroma data and uploaded files survive restarts.
 
-#### Frontend (Next.js)
-- **Vercel** (Recommended): Connect GitHub repo, auto-deploy
-- **Netlify**: Deploy with build command `npm run build`
-- **AWS Amplify**: Connect repository for auto-deployment
+Recommended backend environment values:
+- `ENV=production`
+- `CHROMA_PERSIST_DIRECTORY=/var/data/chroma_db`
+- `UPLOADS_DIR=/var/data/uploads`
+- `ALLOWED_ORIGIN_REGEX=https://.*\.vercel\.app`
+
+Notes:
+- The backend health check is `GET /health`.
+- Render persistent disks require a paid web service plan.
+- If you use a Vercel custom domain, add that domain to `ALLOWED_ORIGINS`.
+
+#### Frontend on Vercel
+1. Import the same GitHub repo into Vercel.
+2. Set the project Root Directory to `frontend`.
+3. Add `BACKEND_URL=https://your-render-backend.onrender.com`.
+4. Do not set `NEXT_PUBLIC_BACKEND_URL` in Vercel. Production traffic should go through the frontend's `/api` proxy.
+5. Deploy.
+
+Why this setup works:
+- Browser requests go to the Vercel frontend at `/api/...`
+- Next.js rewrites those requests to the Render backend using `BACKEND_URL`
+- This avoids direct browser-to-Render CORS issues for the main app flow
 
 ## 🔍 API Documentation
 

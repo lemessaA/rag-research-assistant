@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: rag-research-assistant-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: ENV
+        value: production
+      - key: ALLOWED_ORIGIN_REGEX
+        value: https://.*\.vercel\.app
+      - key: CHROMA_PERSIST_DIRECTORY
+        value: /var/data/chroma_db
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+      - key: GROQ_API_KEY
+        sync: false
+    disk:
+      name: rag-backend-data
+      mountPath: /var/data
+      sizeGB: 1

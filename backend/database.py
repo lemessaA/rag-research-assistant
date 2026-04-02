@@ -1,7 +1,14 @@
+import os
+from pathlib import Path
+
 import chromadb
 from cache import cache
 
 DOCS_DIR = "sample_data"
+CHROMA_PERSIST_DIRECTORY = Path(
+    os.getenv("CHROMA_PERSIST_DIRECTORY", "./chroma_db")
+)
+CHROMA_PERSIST_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
 # Initialize embeddings
 try:
@@ -18,7 +25,7 @@ except ImportError as e:
     EMBEDDINGS_AVAILABLE = False
 
 # Initialize ChromaDB
-client = chromadb.PersistentClient(path="./chroma_db")
+client = chromadb.PersistentClient(path=str(CHROMA_PERSIST_DIRECTORY))
 collection = client.get_or_create_collection(DOCS_DIR)
 
 def get_cached_embedding(text: str) -> list:

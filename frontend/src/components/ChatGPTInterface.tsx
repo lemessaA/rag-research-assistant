@@ -33,7 +33,7 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
   const [isUploading, setIsUploading] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Smart Suggestion System
@@ -55,7 +55,7 @@ export default function ChatGPTInterface({ uploadedFiles, onFileUploaded }: Chat
       lastUserQuestion: lastUserMessage?.content,
       currentMode: selectedMode,
       hasMultipleFiles: uploadedFiles.length > 1,
-      fileTypes: [...new Set(fileTypes)],
+      fileTypes: Array.from(new Set(fileTypes)),
       timeOfDay: timeOfDay as 'morning' | 'afternoon' | 'evening'
     };
   }, [uploadedFiles, messages, selectedMode]);

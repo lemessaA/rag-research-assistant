@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -11,6 +13,14 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", "uploads"))
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+    if origin.strip()
+]
+ALLOWED_ORIGIN_REGEX = os.getenv("ALLOWED_ORIGIN_REGEX")
+
 app = FastAPI(
     title="Research Assistant API",
     description="A RAG-powered research assistant API",
@@ -20,7 +30,8 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(","),
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=ALLOWED_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -63,13 +74,12 @@ async def ask_research_question(request: ResearchRequest):
 async def upload_document(file: UploadFile = File(...)):
     try:
         # Create uploads directory if it doesn't exist
-        uploads_dir = "uploads"
-        os.makedirs(uploads_dir, exist_ok=True)
+        UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
         
         # Generate unique filename
         file_extension = os.path.splitext(file.filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_extension}"
-        file_path = os.path.join(uploads_dir, unique_filename)
+        file_path = UPLOADS_DIR / unique_filename
         
         # Save uploaded file
         with open(file_path, "wb") as buffer:
@@ -78,7 +88,7 @@ async def upload_document(file: UploadFile = File(...)):
         
         # Process and ingest the document
         from rag_service import ingest_document
-        chunks_created = ingest_document(file_path, file.filename)
+        chunks_created = ingest_document(str(file_path), file.filename)
         
         return UploadResponse(
             message=f"Document '{file.filename}' uploaded and processed successfully",

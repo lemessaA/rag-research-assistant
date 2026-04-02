@@ -60,7 +60,7 @@ export default function AIChat({ uploadedFiles, onFileUploaded }: AIChatProps) {
       lastUserQuestion: lastUserMessage?.content,
       currentMode: selectedMode,
       hasMultipleFiles: uploadedFiles.length > 1,
-      fileTypes: [...new Set(fileTypes)],
+      fileTypes: Array.from(new Set(fileTypes)),
       timeOfDay: timeOfDay as 'morning' | 'afternoon' | 'evening'
     };
   }, [uploadedFiles, messages, selectedMode]);
