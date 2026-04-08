@@ -107,7 +107,7 @@ rag-research-assistant/
 │   ├── rag_service.py      # Core RAG functionality
 │   ├── database.py         # Vector database operations
 │   ├── cache.py            # Redis caching
-│   ├── requirements.txt    # Python dependencies
+│   ├── pyproject.toml     # Python dependencies
 │   ├── Dockerfile          # Backend container
 │   └── start-dev.py        # Development server
 ├── frontend/               # Next.js frontend service

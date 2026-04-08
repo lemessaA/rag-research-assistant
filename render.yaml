@@ -3,7 +3,7 @@ services:
     name: rag-research-assistant-backend
     runtime: python
     rootDir: backend
-    buildCommand: uv pip install -r requirements.txt
+    buildCommand: uv pip install .
     startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /health
     envVars:

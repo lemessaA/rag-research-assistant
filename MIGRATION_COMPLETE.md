@@ -24,7 +24,7 @@ rag-research-assistant/
 ├── backend/              # FastAPI service
 │   ├── main.py          # API server
 │   ├── rag_service.py   # Core functionality  
-│   ├── requirements.txt # Python dependencies
+│   ├── pyproject.toml   # Python dependencies
 │   ├── Dockerfile       # Backend container
 │   └── start-dev.py     # Development server
 ├── frontend/            # Next.js service
