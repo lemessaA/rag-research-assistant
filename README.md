@@ -71,7 +71,7 @@ docker-compose up --build
 cd backend
 
 # Install Python dependencies
-pip install -r requirements.txt
+pip install .
 
 # Copy and configure environment
 cp .env.example .env

@@ -1,0 +1,39 @@
+[project]
+name = "rag-backend"
+version = "0.1.0"
+description = "Backend service for RAG Research Assistant"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+    "redis",
+    "sentence-transformers",
+    "chromadb",
+    "langchain",
+    "langchain-community",
+    "langchain-core",
+    "langchain-huggingface",
+    "langchain-groq",
+    "langchain-text-splitters",
+    "unstructured",
+    "docx2txt",
+    "openpyxl",
+    "python-pptx",
+    "beautifulsoup4",
+    "markdown",
+    "python-dotenv",
+    "requests",
+    "pydantic",
+    "PyPDF2",
+    "transformers",
+    "torch",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["."]

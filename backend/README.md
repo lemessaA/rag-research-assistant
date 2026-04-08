@@ -16,7 +16,7 @@ FastAPI-based backend service for the RAG Research Assistant application.
 ### Development
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+pip install .
 
 # Copy and configure environment
 cp .env.example .env

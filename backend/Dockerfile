@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy configuration and install Python dependencies
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
 
 # Copy application code
 COPY . .
