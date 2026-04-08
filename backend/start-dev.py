@@ -30,7 +30,7 @@ def main():
         # Run uvicorn with development settings
         subprocess.run([
             sys.executable, "-m", "uvicorn",
-            "main:app",
+            "app:app",
             "--host", "0.0.0.0",
             "--port", "8000",
             "--reload",

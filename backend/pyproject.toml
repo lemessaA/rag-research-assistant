@@ -37,8 +37,5 @@ dependencies = [
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["."]
-
 [tool.fastapi]
-app = "main:app"
+app = "app:app"
