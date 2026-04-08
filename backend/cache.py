@@ -11,7 +11,7 @@ load_dotenv(Path(__file__).parent / ".env")
 class RedisCache:
     def __init__(self):
         self.redis_client = None
-        self._connect()
+        self._connect() # 
 
     def _connect(self):
         """Connect to Redis server"""
