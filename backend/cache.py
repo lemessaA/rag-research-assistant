@@ -20,9 +20,12 @@ class RedisCache:
         try:
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
             self.redis_client = redis.from_url(redis_url, decode_responses=True)
-            # Test connection
-            self.redis_client.ping()
-            print("✅ Connected to Redis")
+            if self.redis_client:
+                # Test connection
+                self.redis_client.ping()
+                print("✅ Connected to Redis")
+            else:
+                print("⚠️  Redis client could not be created, using in-memory fallback")
         except (redis.ConnectionError, redis.TimeoutError):
             print("⚠️  Redis not available, using in-memory fallback")
             self.redis_client = None
