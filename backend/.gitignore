@@ -39,6 +39,7 @@ ENV/
 # Uploads and data
 uploads/
 chroma_data/
+chroma_db/
 *.db
 *.sqlite
 *.sqlite3
