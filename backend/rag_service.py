@@ -10,7 +10,15 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv(Path(__file__).parent / ".env")
 
-llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0.7, api_key=os.getenv("GROQ_API_KEY"))
+def get_llm():
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key or api_key == "your_groq_api_key_here":
+        # Return a mock or handle it gracefully
+        print("⚠️  Warning: GROQ_API_KEY is missing. LLM features will be unavailable.")
+        return None
+    return ChatGroq(model="openai/gpt-oss-20b", temperature=0.7, api_key=api_key)
+
+llm = get_llm()
 
 def search_research_db(query: str, top_k: int = 3):
     # Check cache first
@@ -197,6 +205,9 @@ End with encouragement and potential follow-up questions.
         input_variables=["context", "question"],
         template=selected_prompt
     ).format(context=context, question=query)
+    
+    if llm is None:
+        return ("⚠️ Error: AI Assistant is not configured. Please set the GROQ_API_KEY in your environment variables.", [])
     
     answer = llm.invoke(prompt).content
     response = (answer, chunks)
