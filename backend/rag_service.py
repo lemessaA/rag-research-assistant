@@ -1,6 +1,6 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
-from database import embeddings, collection, get_cached_embedding
+from database import collection, get_cached_embedding
 from cache import cache
 import os
 from dotenv import load_dotenv
