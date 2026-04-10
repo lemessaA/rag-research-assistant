@@ -1,4 +1,3 @@
-import redis
 import json
 import hashlib
 import os
@@ -8,33 +7,12 @@ from pathlib import Path
 
 load_dotenv(Path(__file__).parent / ".env")
 
-class RedisCache:
+class InMemoryCache:
     def __init__(self):
-        self.in_memory_cache = {}
-        self.redis_client = None
-        self._connect()
-
-    def _connect(self):
-        """Connect to Redis server"""
-        self.in_memory_cache = {}  # Fallback
-        try:
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            self.redis_client = redis.from_url(redis_url, decode_responses=True)
-            if self.redis_client:
-                # Test connection
-                self.redis_client.ping()
-                print("✅ Connected to Redis")
-            else:
-                print("⚠️  Redis client could not be created, using in-memory fallback")
-        except (redis.ConnectionError, redis.TimeoutError):
-            print("⚠️  Redis not available, using in-memory fallback")
-            self.redis_client = None
-        except Exception as e:
-            print(f"⚠️  Redis connection error: {e}, using in-memory fallback")
-            self.redis_client = None
+        self.cache = {}
+        print("💡 Using in-memory cache (No Redis)")
 
     def _get_cache_key(self, prefix: str, data: Any) -> str:
-
         """Generate a cache key from data"""
         if isinstance(data, str):
             content = data
@@ -44,42 +22,16 @@ class RedisCache:
 
     def get(self, key: str) -> Optional[Any]:
         """Get value from cache"""
-        client = self.redis_client
-        if not client:
-            return self.in_memory_cache.get(key)
-        try:
-            value = client.get(key)
-            return json.loads(value) if value else None
-        except Exception:
-            return self.in_memory_cache.get(key)
-
-
+        return self.cache.get(key)
 
     def set(self, key: str, value: Any, ttl: int = 3600) -> bool:
-        """Set value in cache with TTL"""
-        client = self.redis_client
-        if not client:
-            self.in_memory_cache[key] = value
-            return True
-        try:
-            return client.setex(key, ttl, json.dumps(value))
-        except Exception:
-            self.in_memory_cache[key] = value
-            return True
-
-
+        """Set value in cache (TTL ignored in simple in-memory version)"""
+        self.cache[key] = value
+        return True
 
     def delete(self, key: str) -> bool:
         """Delete key from cache"""
-        client = self.redis_client
-        if not client:
-            return bool(self.in_memory_cache.pop(key, None))
-        try:
-            return bool(client.delete(key))
-        except Exception:
-            return bool(self.in_memory_cache.pop(key, None))
-
-
+        return bool(self.cache.pop(key, None))
 
     def get_or_set(self, key: str, func, ttl: int = 3600, *args, **kwargs):
         """Get from cache or compute and cache"""
@@ -113,15 +65,8 @@ class RedisCache:
 
     def clear_all_cache(self) -> bool:
         """Clear all cached data"""
-        self.in_memory_cache.clear()
-        client = self.redis_client
-        if not client:
-            return True
-        try:
-            return client.flushdb()
-        except Exception:
-            return True
-
+        self.cache.clear()
+        return True
 
 # Global cache instance
-cache = RedisCache()
+cache = InMemoryCache()
