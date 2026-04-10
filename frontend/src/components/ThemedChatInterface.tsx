@@ -255,15 +255,16 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
         <div className="flex items-center space-x-3">
           <div className="text-2xl animate-pulse">🤖</div>
           <div>
-            <h1 className="text-xl font-semibold">AI Research Assistant</h1>
-            <p className="text-sm opacity-80">Powered by Advanced Intelligence</p>
+            <h1 className="text-lg sm:text-xl font-semibold leading-tight">AI Research Assistant</h1>
+            <p className="text-xs sm:text-sm opacity-80 hidden xs:block">Powered by Advanced Intelligence</p>
           </div>
           {uploadedFiles.length > 0 && (
-            <span className="text-sm bg-white/20 backdrop-blur px-3 py-1 rounded-full">
-              {uploadedFiles.length} document{uploadedFiles.length !== 1 ? 's' : ''} loaded
+            <span className="text-[10px] sm:text-sm bg-white/20 backdrop-blur px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
+              {uploadedFiles.length} <span className="hidden xs:inline">doc{uploadedFiles.length !== 1 ? 's' : ''}</span>
             </span>
           )}
         </div>
+
 
         <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
@@ -363,14 +364,15 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                 <div key={message.id}>
                   {message.type === 'user' ? (
                     <div className="flex justify-end">
-                      <div className="max-w-5xl bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-4 shadow-sm">
-                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                      <div className="max-w-[85%] sm:max-w-5xl bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-3 sm:p-4 shadow-sm">
+                        <div className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{message.content}</div>
                         {message.mode && (
-                          <div className="text-xs opacity-75 mt-2">
+                          <div className="text-[10px] opacity-75 mt-2">
                             {RESEARCH_MODES.find(m => m.value === message.mode)?.label} mode
                           </div>
                         )}
                       </div>
+
                     </div>
                   ) : message.type === 'system' ? (
                     <div className="flex justify-center">
@@ -380,7 +382,8 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                     </div>
                   ) : (
                     <div className="flex justify-start">
-                      <div className={`max-w-5xl ${theme.card} ${theme.text} rounded-xl p-4 shadow-sm border ${theme.border} backdrop-blur`}>
+                      <div className={`max-w-[90%] sm:max-w-5xl ${theme.card} ${theme.text} rounded-xl p-3 sm:p-4 shadow-sm border ${theme.border} backdrop-blur`}>
+
                         {message.thinking ? (
                           <div className="flex items-center space-x-3">
                             <div className="flex space-x-1">
@@ -490,10 +493,9 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={uploadedFiles.length > 0 ? "Message your AI Research Assistant..." : "Upload documents to unlock AI intelligence..."}
                   disabled={isLoading}
-                  rows={1}
-                  className={`w-full p-3 pr-12 border ${theme.border} rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 ${theme.card} backdrop-blur shadow-sm ${theme.text}`}
-                  style={{
-                    minHeight: '50px',
+                  className={`w-full p-3 pr-10 sm:pr-12 border ${theme.border} rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 ${theme.card} backdrop-blur shadow-sm ${theme.text} text-sm sm:text-base`}
+                  style={{ 
+                    minHeight: '44px',
                     maxHeight: '150px'
                   }}
                   onKeyDown={(e) => {
@@ -509,10 +511,10 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className={`absolute right-3 bottom-3 p-1.5 ${theme.accent} hover:bg-blue-100 rounded-full transition-colors disabled:opacity-50`}
+                  className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 p-1.5 ${theme.accent} hover:bg-blue-100 rounded-full transition-colors disabled:opacity-50`}
                   title="Upload document"
                 >
-                  <span className="text-lg">📎</span>
+                  <span className="text-base sm:text-lg">📎</span>
                 </button>
 
                 <input
