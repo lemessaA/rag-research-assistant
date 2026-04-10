@@ -38,7 +38,7 @@ const themes = {
   },
   dark: {
     name: 'Dark',
-    icon: '🌙', 
+    icon: '🌙',
     background: 'from-slate-900 to-slate-800',
     header: 'from-slate-800 to-slate-700',
     card: 'bg-slate-800',
@@ -65,7 +65,7 @@ const themes = {
     header: 'from-orange-600 to-red-600',
     card: 'bg-white/90',
     text: 'text-slate-800',
-    textSecondary: 'text-slate-600', 
+    textSecondary: 'text-slate-600',
     accent: 'text-orange-600',
     border: 'border-orange-200'
   },
@@ -169,9 +169,9 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
 
     try {
       const result = await api.research({ question, mode: selectedMode });
-      
+
       setMessages(prev => prev.slice(0, -1));
-      
+
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 2).toString(),
         type: 'assistant',
@@ -179,21 +179,21 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
         timestamp: new Date().toISOString(),
         sources: result.sources,
       };
-      
+
       setMessages(prev => [...prev, assistantMessage]);
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       setMessages(prev => prev.slice(0, -1));
-      
+
       const errorMessage: ChatMessage = {
         id: (Date.now() + 2).toString(),
         type: 'assistant',
-        content: error instanceof APIError 
+        content: error instanceof APIError
           ? `I encountered an issue: ${error.message}`
           : `I'm having trouble connecting. Please check if the backend is running.`,
         timestamp: new Date().toISOString(),
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -205,7 +205,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
 
     try {
       const result = await api.uploadFile(file);
-      
+
       const uploadedFile: UploadedFile = {
         name: file.name,
         size: file.size,
@@ -213,9 +213,9 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
         uploadedAt: new Date().toISOString(),
         chunksCreated: result.chunks_created,
       };
-      
+
       onFileUploaded(uploadedFile);
-      
+
       const systemMessage: ChatMessage = {
         id: `upload-${Date.now()}`,
         type: 'system',
@@ -223,7 +223,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, systemMessage]);
-      
+
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -231,7 +231,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
       const errorMessage: ChatMessage = {
         id: `error-${Date.now()}`,
         type: 'system',
-        content: error instanceof APIError 
+        content: error instanceof APIError
           ? `Upload failed: ${error.message}`
           : 'Upload failed. Please check your connection.',
         timestamp: new Date().toISOString(),
@@ -255,17 +255,16 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
         <div className="flex items-center space-x-3">
           <div className="text-2xl animate-pulse">🤖</div>
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold leading-tight">AI Research Assistant</h1>
-            <p className="text-xs sm:text-sm opacity-80 hidden xs:block">Powered by Advanced Intelligence</p>
+            <h1 className="text-xl font-semibold">AI Research Assistant</h1>
+            <p className="text-sm opacity-80">Powered by Advanced Intelligence</p>
           </div>
           {uploadedFiles.length > 0 && (
-            <span className="text-[10px] sm:text-sm bg-white/20 backdrop-blur px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
-              {uploadedFiles.length} <span className="hidden xs:inline">doc{uploadedFiles.length !== 1 ? 's' : ''}</span>
+            <span className="text-sm bg-white/20 backdrop-blur px-3 py-1 rounded-full">
+              {uploadedFiles.length} document{uploadedFiles.length !== 1 ? 's' : ''} loaded
             </span>
           )}
         </div>
 
-        
         <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
           <div className="relative">
@@ -290,7 +289,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                       {(Object.keys(themes) as Theme[]).map((themeName) => {
                         const themeOption = themes[themeName];
                         const isActive = currentTheme === themeName;
-                        
+
                         return (
                           <button
                             key={themeName}
@@ -298,11 +297,10 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                               setCurrentTheme(themeName);
                               setShowThemeMenu(false);
                             }}
-                            className={`w-full flex items-center space-x-3 px-3 py-2 text-left rounded-md transition-colors text-sm ${
-                              isActive 
-                                ? 'bg-blue-50 text-blue-700' 
+                            className={`w-full flex items-center space-x-3 px-3 py-2 text-left rounded-md transition-colors text-sm ${isActive
+                                ? 'bg-blue-50 text-blue-700'
                                 : 'text-gray-700 hover:bg-gray-50'
-                            }`}
+                              }`}
                           >
                             <span className="text-lg">{themeOption.icon}</span>
                             <div className="flex-1">
@@ -345,7 +343,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                 How can I assist your research today?
               </h2>
               <p className={`${theme.textSecondary} mb-6`}>Upload documents to expand my knowledge and ask intelligent questions</p>
-              
+
               {/* Initial Suggestions */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl mx-auto">
                 {suggestions.slice(0, 6).map((suggestion, index) => (
@@ -365,10 +363,10 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                 <div key={message.id}>
                   {message.type === 'user' ? (
                     <div className="flex justify-end">
-                      <div className="max-w-[85%] sm:max-w-5xl bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-3 sm:p-4 shadow-sm">
-                        <div className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{message.content}</div>
+                      <div className="max-w-5xl bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-4 shadow-sm">
+                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                         {message.mode && (
-                          <div className="text-[10px] opacity-75 mt-2">
+                          <div className="text-xs opacity-75 mt-2">
                             {RESEARCH_MODES.find(m => m.value === message.mode)?.label} mode
                           </div>
                         )}
@@ -382,8 +380,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                     </div>
                   ) : (
                     <div className="flex justify-start">
-                      <div className={`max-w-[90%] sm:max-w-5xl ${theme.card} ${theme.text} rounded-xl p-3 sm:p-4 shadow-sm border ${theme.border} backdrop-blur`}>
-
+                      <div className={`max-w-5xl ${theme.card} ${theme.text} rounded-xl p-4 shadow-sm border ${theme.border} backdrop-blur`}>
                         {message.thinking ? (
                           <div className="flex items-center space-x-3">
                             <div className="flex space-x-1">
@@ -399,11 +396,11 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                               <span className="animate-pulse">🤖</span>
                               <span>AI Assistant</span>
                             </div>
-                            <FormattedText 
+                            <FormattedText
                               content={message.content}
                               className="max-w-none"
                             />
-                            
+
                             {message.sources && message.sources.length > 0 && (
                               <div className={`mt-4 pt-3 border-t ${theme.border}`}>
                                 <div className={`text-sm font-medium ${theme.text} mb-2`}>
@@ -425,28 +422,28 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                             )}
 
                             {/* Quick Follow-up Suggestions */}
-                            {messages.indexOf(message) === messages.length - 1 && 
-                             !isLoading &&
-                             contextualPrompts.length > 0 && (
-                              <div className={`mt-4 pt-3 border-t ${theme.border}`}>
-                                <div className={`text-xs ${theme.textSecondary} mb-2`}>Continue conversation:</div>
-                                <div className="flex flex-wrap gap-2">
-                                  {contextualPrompts.slice(0, 3).map((prompt, index) => (
-                                    <button
-                                      key={`follow-${index}`}
-                                      onClick={() => handleSubmit(prompt.text)}
-                                      disabled={isLoading}
-                                      className={`text-xs px-3 py-1 ${theme.card} ${theme.accent} rounded-full hover:opacity-80 transition-colors disabled:opacity-50 border ${theme.border}`}
-                                    >
-                                      {prompt.text.length > 35 ? prompt.text.substring(0, 32) + '...' : prompt.text}
-                                    </button>
-                                  ))}
+                            {messages.indexOf(message) === messages.length - 1 &&
+                              !isLoading &&
+                              contextualPrompts.length > 0 && (
+                                <div className={`mt-4 pt-3 border-t ${theme.border}`}>
+                                  <div className={`text-xs ${theme.textSecondary} mb-2`}>Continue conversation:</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {contextualPrompts.slice(0, 3).map((prompt, index) => (
+                                      <button
+                                        key={`follow-${index}`}
+                                        onClick={() => handleSubmit(prompt.text)}
+                                        disabled={isLoading}
+                                        className={`text-xs px-3 py-1 ${theme.card} ${theme.accent} rounded-full hover:opacity-80 transition-colors disabled:opacity-50 border ${theme.border}`}
+                                      >
+                                        {prompt.text.length > 35 ? prompt.text.substring(0, 32) + '...' : prompt.text}
+                                      </button>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
                           </>
                         )}
-                        
+
                         <div className={`text-xs opacity-50 mt-2 ${theme.textSecondary}`}>
                           {new Date(message.timestamp).toLocaleTimeString()}
                         </div>
@@ -494,9 +491,9 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                   placeholder={uploadedFiles.length > 0 ? "Message your AI Research Assistant..." : "Upload documents to unlock AI intelligence..."}
                   disabled={isLoading}
                   rows={1}
-                  className={`w-full p-3 pr-10 sm:pr-12 border ${theme.border} rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 ${theme.card} backdrop-blur shadow-sm ${theme.text} text-sm sm:text-base`}
-                  style={{ 
-                    minHeight: '44px',
+                  className={`w-full p-3 pr-12 border ${theme.border} rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 ${theme.card} backdrop-blur shadow-sm ${theme.text}`}
+                  style={{
+                    minHeight: '50px',
                     maxHeight: '150px'
                   }}
                   onKeyDown={(e) => {
@@ -506,18 +503,17 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                     }
                   }}
                 />
-                
+
                 {/* Upload Button */}
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 p-1.5 ${theme.accent} hover:bg-blue-100 rounded-full transition-colors disabled:opacity-50`}
+                  className={`absolute right-3 bottom-3 p-1.5 ${theme.accent} hover:bg-blue-100 rounded-full transition-colors disabled:opacity-50`}
                   title="Upload document"
                 >
-                  <span className="text-base sm:text-lg">📎</span>
+                  <span className="text-lg">📎</span>
                 </button>
-
 
                 <input
                   ref={fileInputRef}
@@ -528,7 +524,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
                   disabled={isUploading}
                 />
               </div>
-              
+
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
@@ -544,7 +540,7 @@ export default function ThemedChatInterface({ uploadedFiles, onFileUploaded }: T
               </button>
             </div>
           </form>
-          
+
           {/* AI Status */}
           {isUploading && (
             <div className={`mt-2 text-sm ${theme.accent} text-center flex items-center justify-center space-x-2`}>

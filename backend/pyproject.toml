@@ -8,8 +8,9 @@ requires-python = "==3.12.*"
 dependencies = [
     "fastapi[standard]",
     "python-multipart",
-    "sentence-transformers",
 
+    "redis",
+    "sentence-transformers",
     "chromadb",
     "langchain",
     "langchain-community",
