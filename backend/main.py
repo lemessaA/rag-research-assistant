@@ -59,7 +59,7 @@ class UploadResponse(BaseModel):
 async def ask_research_question(request: ResearchRequest):
     try:
         answer, sources = answer_research_question(request.question, request.mode)
-        formatted = [
+        formatted = [ 
             Source(
                 title=s["title"],
                 content=s["content"][:200] + "..." if len(s["content"]) > 200 else s["content"],
